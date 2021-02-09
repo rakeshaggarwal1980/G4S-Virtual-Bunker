@@ -23,7 +23,7 @@ steps:
 - task: ArchiveFiles@2
   displayName: "Archive files"
   inputs:
-    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/*.*"
+    rootFolderOrFile: "$(System.ArtifactStagingDirectory)/app"
     includeRootFolder: false
     archiveFile: "$(System.DefaultWorkingDirectory)/$(Build.BuildId).zip"
 - task: PublishBuildArtifacts@1
