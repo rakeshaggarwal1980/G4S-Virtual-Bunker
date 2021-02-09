@@ -21,9 +21,12 @@ steps:
   workingDirectory: $(Build.SourcesDirectory)/ClientApp
   displayName: 'npm install'
 
+- script: npm install -g @angular/cli
+  displayName: 'npm install'
+
 - script: ng build --prod
   workingDirectory: $(Build.SourcesDirectory)/ClientApp
-  displayName: 'npm install'
+  displayName: 'ng build'
 
 - task: CopyFiles@2
   inputs:
