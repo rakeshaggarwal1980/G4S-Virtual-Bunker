@@ -20,9 +20,13 @@ steps:
 - script: dotnet publish --configuration $(buildConfiguration) --output '$(Build.ArtifactStagingDirectory)/app'
   workingDirectory: $(Build.SourcesDirectory)
   displayName: 'dotnet publish $(buildConfiguration)'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publishing app artifact'
+- task: ArchiveFiles@2
+  displayName: "Archive files"
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)/app'
-    artifactName: app
+    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/app"
+    includeRootFolder: false
+    archiveFile: "$(System.DefaultWorkingDirectory)/$(Build.BuildId).zip"
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/$(Build.BuildId).zip'
+    artifactName: 'drop'
