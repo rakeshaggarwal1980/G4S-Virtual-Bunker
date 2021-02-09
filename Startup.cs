@@ -28,10 +28,10 @@ namespace TeamCollaborationApp
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            //services.AddSpaStaticFiles(configuration =>
+            //{
+            //    configuration.RootPath = "ClientApp/dist";
+            //});
 
             /*******/
             services.Configure<TwilioSettings>(
@@ -42,7 +42,7 @@ namespace TeamCollaborationApp
                     settings.ApiKey = "SK24c672067c60c99757607f5a14ece7b0"; //Environment.GetEnvironmentVariable("TWILIO_API_KEY");
                 })
             .AddTransient<IVideoService, VideoService>()
-            .AddSpaStaticFiles(config => config.RootPath = "ClientApp/dist");
+            .AddSpaStaticFiles(config => config.RootPath = "ClientApp");
 
             services.AddSignalR();
             /*******/
