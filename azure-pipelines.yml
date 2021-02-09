@@ -22,7 +22,7 @@ steps:
   displayName: 'npm install'
 
 - script: npm install -g @angular/cli
-  displayName: 'npm install'
+  displayName: 'install angular/cli'
 
 - script: ng build --prod
   workingDirectory: $(Build.SourcesDirectory)/ClientApp
