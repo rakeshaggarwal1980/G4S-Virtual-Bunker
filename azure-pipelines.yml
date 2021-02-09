@@ -30,7 +30,8 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    contents: $(Build.SourcesDirectory)/ClientApp/ClientApp/*
+    SourceFolder: $(Build.SourcesDirectory)/ClientApp/ClientApp
+    contents: '*'
     targetFolder: $(Build.ArtifactStagingDirectory)/app/ClientApp
 
 - script: dotnet build --configuration $(buildConfiguration)
