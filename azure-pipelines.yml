@@ -21,6 +21,15 @@ steps:
   workingDirectory: $(Build.SourcesDirectory)/ClientApp
   displayName: 'npm install'
 
+- script: ng build --prod
+  workingDirectory: $(Build.SourcesDirectory)/ClientApp
+  displayName: 'npm install'
+
+- task: CopyFiles@2
+  inputs:
+    contents: $(Build.SourcesDirectory)/ClientApp/ClientApp/**
+    targetFolder: $(Build.ArtifactStagingDirectory)/app/ClientApp
+
 - script: dotnet build --configuration $(buildConfiguration)
   workingDirectory: $(Build.SourcesDirectory)
   displayName: 'dotnet build $(buildConfiguration)'
