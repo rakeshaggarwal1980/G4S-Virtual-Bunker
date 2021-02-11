@@ -13,6 +13,27 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: NodeTool@0 
+  inputs:
+    versionSpec: '12.0'
+
+- script: npm install
+  workingDirectory: $(Build.SourcesDirectory)/ClientApp
+  displayName: 'npm install'
+
+- script: npm install -g @angular/cli
+  displayName: 'install angular/cli'
+
+- script: ng build --prod
+  workingDirectory: $(Build.SourcesDirectory)/ClientApp
+  displayName: 'ng build'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: $(Build.SourcesDirectory)/ClientApp/ClientApp
+    contents: '*'
+    targetFolder: $(Build.ArtifactStagingDirectory)/app/ClientApp
+
 - script: dotnet build --configuration $(buildConfiguration)
   workingDirectory: $(Build.SourcesDirectory)
   displayName: 'dotnet build $(buildConfiguration)'
@@ -23,7 +44,7 @@ steps:
 - task: ArchiveFiles@2
   displayName: "Archive files"
   inputs:
-    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/*.*"
+    rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/app"
     includeRootFolder: false
     archiveFile: "$(System.DefaultWorkingDirectory)/$(Build.BuildId).zip"
 - task: PublishBuildArtifacts@1
