@@ -3,7 +3,8 @@
         <!--<a href="https://twitter.com/davidpine7" target="_blank"><i class="fab fa-twitter"></i> @davidpine7</a>-->
     </div>
     <div class="grid-left">
-        <app-rooms #rooms (roomChanged)="onRoomChanged($event)"
+        <app-rooms #rooms (roomChanged)="onRoomChanged($event)" (miceHandler)="onMiceHanlder($event)" (videoHandler)="onVideoHanlder($event)"
+                   (screenHandler)="captureScreen()"
                    [activeRoomName]="!!activeRoom ? activeRoom.name : null"></app-rooms>
     </div>
     <div class="grid-content">
@@ -22,4 +23,6 @@
             Team Collaboration App
         </a>
     </div>
+
+    <div id="screenp" #screenp></div>
 </div>

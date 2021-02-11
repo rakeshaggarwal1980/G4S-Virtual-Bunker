@@ -10,10 +10,15 @@ import { NamedRoom, VideoChatService } from '../services/videochat.service';
 })
 export class RoomsComponent implements OnInit, OnDestroy {
     @Output() roomChanged = new EventEmitter<string>();
+    @Output() miceHandler = new EventEmitter<boolean>();
+    @Output() videoHandler = new EventEmitter<boolean>();
+    @Output() screenHandler = new EventEmitter<void>();
     @Input() activeRoomName: string;
 
     roomName: string;
     rooms: NamedRoom[];
+    isEnableAudio: boolean = true;
+    isEnableVideo: boolean = true;
 
     private subscription: Subscription;
 
@@ -52,6 +57,19 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
     async updateRooms() {
         this.rooms = (await this.videoChatService.getAllRooms()) as NamedRoom[];
+    }
+
+    onMiceHanlder() {
+        this.isEnableAudio = !this.isEnableAudio;
+        this.miceHandler.emit(this.isEnableAudio);
+    }
+    onVideoHanlder() {
+        this.isEnableVideo = !this.isEnableVideo;
+        this.videoHandler.emit(this.isEnableVideo);
+    }
+
+    onCaptureScreen() {
+        this.screenHandler.emit();
     }
 }
 

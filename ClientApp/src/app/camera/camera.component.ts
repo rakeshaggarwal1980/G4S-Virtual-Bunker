@@ -45,6 +45,28 @@ export class CameraComponent implements AfterViewInit {
             console.error(e);
         }
     }
+    
+    removeVideo() {
+        try {
+            if (this.videoTrack) {
+
+                this.videoTrack.stop();
+
+                //this.videoTrack.forEach(publication => {
+                //    publication.track.stop();
+                //    publication.unpublish();
+                //});
+
+                this.videoTrack.disable();
+
+                this.videoTrack.enable(false);
+
+                this.videoTrack.detach().forEach(element => element.remove());
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
 
     private async initializeDevice(kind?: MediaDeviceKind, deviceId?: string) {
         try {

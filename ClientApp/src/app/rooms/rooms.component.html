@@ -28,5 +28,24 @@
                 {{ room.participantCount }} / {{ room.maxParticipants }}
             </span>
         </a>
+
+        <div class="device-ctr-size">
+            <button type="button" class="btn btn-lg" (click)="onMiceHanlder()"
+                    title="Click to mute/unmute mice">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+        <div class="device-ctr-size">
+            <button type="button" class="btn btn-lg" (click)="onVideoHanlder()"
+                    title="Click to enable/disable video">
+                <i class="fas fa-video"></i>
+            </button>
+        </div>
+        <div class="device-ctr-size">
+            <button type="button" class="btn btn-lg" (click)="onCaptureScreen()"
+                    title="Click to enable/disable video">
+                <i class="fas fa-desktop"></i>
+            </button>
+        </div>
     </div>
 </div>

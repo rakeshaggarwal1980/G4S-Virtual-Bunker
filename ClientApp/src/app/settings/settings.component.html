@@ -16,6 +16,9 @@
                                [label]="'Video Input Source'" [devices]="devices"
                                (settingsChanged)="onSettingsChanged($event)"></app-device-select>
         </div>
+
+        
+
     </form>
     <div [style.display]="isPreviewing ? 'block' : 'none'">
         <app-camera #camera></app-camera>
