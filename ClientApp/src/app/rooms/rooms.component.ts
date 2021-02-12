@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, EventEmitter, Output, Input, ViewChild, ElementRef, Renderer2 } from '@angular/core';
-import { Message } from 'twilio-chat/lib/Message';
 import { Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { NamedRoom, VideoChatService } from '../services/videochat.service';
@@ -27,8 +26,6 @@ export class RoomsComponent implements OnInit, OnDestroy {
     isEnableVideo: boolean = true;
 
     private subscription: Subscription;
-
-    private messages: Message[] = [];
 
     constructor(
         private readonly videoChatService: VideoChatService, private renderer: Renderer2) {
