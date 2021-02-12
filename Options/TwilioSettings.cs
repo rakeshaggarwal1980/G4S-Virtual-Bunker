@@ -21,5 +21,10 @@ namespace TeamCollaborationApp.Options
         /// The API Secret that corresponds to the <see cref="ApiKey"/>.
         /// </summary>
         public string ApiSecret { get; set; }
+
+        /// <summary>
+        /// Required for Chat
+        /// </summary>
+        public string ChatServiceSid { get; set; }
     }
 }

@@ -18,14 +18,16 @@
     "@angular/platform-browser-dynamic": "~11.0.9",
     "@angular/platform-server": "8.2.14",
     "@angular/router": "~11.0.9",
-    "rxjs": "~6.6.0",
-    "tslib": "^2.0.0",
-    "zone.js": "~0.10.2",
-    "@nguniversal/module-map-ngfactory-loader": "7.0.2",
     "@microsoft/signalr": "3.0.1",
+    "@nguniversal/module-map-ngfactory-loader": "7.0.2",
     "aspnet-prerendering": "^3.0.1",
     "core-js": "^2.6.1",
-    "twilio-video": "2.0.0-beta15"
+    "lit-html": "^2.0.0-pre.6",
+    "rxjs": "~6.6.0",
+    "tslib": "^2.0.0",
+    "twilio-chat": "^4.1.0",
+    "twilio-video": "2.0.0-beta15",
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.7",

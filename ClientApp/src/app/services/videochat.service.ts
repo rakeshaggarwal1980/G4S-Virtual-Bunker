@@ -1,4 +1,5 @@
 import { connect, ConnectOptions, LocalTrack, Room } from 'twilio-video';
+import { Client } from 'twilio-chat';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ReplaySubject, Observable } from 'rxjs';
@@ -22,16 +23,25 @@ export type Rooms = NamedRoom[];
 export class VideoChatService {
     $roomsUpdated: Observable<boolean>;
 
+    private chatClient: Client;
+    // A handle to the "general" chat channel - the one and only channel we
+    // will have in this sample app
+    private generalChannel;
+
+    // The server will assign the client a random username - store that value
+    // here
+    private username: string;
+
     private roomBroadcast = new ReplaySubject<boolean>();
 
     constructor(private readonly http: HttpClient) {
         this.$roomsUpdated = this.roomBroadcast.asObservable();
     }
 
-    private async getAuthToken() {
+    private async getAuthToken(identity: string) {
         const auth =
             await this.http
-                .get<AuthToken>(`api/video/token`)
+                .get<AuthToken>(`api/video/token/` + identity)
                 .toPromise();
 
         return auth.token;
@@ -46,7 +56,7 @@ export class VideoChatService {
     async joinOrCreateRoom(name: string, tracks: LocalTrack[]) {
         let room: Room = null;
         try {
-            const token = await this.getAuthToken();
+            const token = await this.getAuthToken(null);
             room =
                 await connect(
                     token, {
@@ -63,6 +73,61 @@ export class VideoChatService {
         }
 
         return room;
+    }
+
+    async refreshToken(identity) {
+        console.log('Token about to expire');
+        console.log('updated token for chat client');
+        const token = await this.getAuthToken(identity);
+
+        this.chatClient.updateToken(token);
+    }
+    
+    async createOrJoinGeneralChannel() {
+        try {
+
+            const ADJECTIVES = [
+                'Abrasive', 'Brash', 'Callous', 'Daft', 'Eccentric', 'Fiesty', 'Golden',
+                'Holy', 'Ignominious', 'Joltin', 'Killer', 'Luscious', 'Mushy', 'Nasty',
+                'OldSchool', 'Pompous', 'Quiet', 'Rowdy', 'Sneaky', 'Tawdry',
+                'Unique', 'Vivacious', 'Wicked', 'Xenophobic', 'Yawning', 'Zesty',
+            ];
+            const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            let name = rand(ADJECTIVES);
+            console.log('Joining channel as ' + name);
+
+            const token = await this.getAuthToken(name);
+            console.log('token generated');
+            this.chatClient = await Client.create(token);
+            console.log('created client');
+            await this.chatClient.getSubscribedChannels();
+            console.log('getSubscribedChannels success!');
+            let channel = await this.chatClient.getChannelByUniqueName('general');
+            console.log('getChannelByUniqueName success!');
+
+            this.generalChannel = channel;
+            await this.generalChannel.join();
+            console.log('Joined channel as ' + name);
+
+            // when the access token is about to expire, refresh it
+            this.chatClient.on('tokenAboutToExpire', function () {
+                this.refreshToken(name);
+            });
+
+            // if the access token already expired, refresh it
+            this.chatClient.on('tokenExpired', function () {
+                this.refreshToken(name);
+            });
+
+        } catch (error) {
+            console.error(`Unable to connect to Room: ${error.message}`);
+        } finally {
+            if (name) {
+                this.roomBroadcast.next(true);
+            }
+        }
+
+        return this.generalChannel;
     }
 
     nudge() {
