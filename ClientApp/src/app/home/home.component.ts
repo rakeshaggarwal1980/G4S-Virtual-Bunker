@@ -1,5 +1,6 @@
 import { Component, ViewChild, OnInit, Renderer2, ElementRef, AfterViewInit } from '@angular/core';
 import { Room, LocalTrack, LocalVideoTrack, LocalAudioTrack, RemoteParticipant } from 'twilio-video';
+import { Client } from 'twilio-chat';
 import { RoomsComponent } from '../rooms/rooms.component';
 import { CameraComponent } from '../camera/camera.component';
 import { SettingsComponent } from '../settings/settings.component';
@@ -27,6 +28,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     private videoTrack: LocalVideoTrack;
 
     private notificationHub: HubConnection;
+    private generalChannel;
 
 
     constructor(
@@ -99,9 +101,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
             /* Hide the associated <video> element and show an avatar image. */
         });
     }
-
-
-
 
     onVideoHanlder(isEnableVideo: boolean) {
         //this.activeRoom.participants.forEach(participant => {
@@ -215,6 +214,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
             return new LocalVideoTrack(stream.getVideoTracks()[0]);
             });
     }
+
 
     onMiceHanlder(isEnableAudio: boolean) {
         this.activeRoom.localParticipant.audioTracks.forEach(publication => {

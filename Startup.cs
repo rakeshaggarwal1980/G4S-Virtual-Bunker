@@ -40,6 +40,7 @@ namespace TeamCollaborationApp
                     settings.AccountSid = "ACdf18fa6baaa5ce6554b45469beff95ff"; //Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_SID");
                     settings.ApiSecret = "mPCXgpFDoY4rN46xHwH35ukJsyqS0pv6"; //Environment.GetEnvironmentVariable("TWILIO_API_SECRET");
                     settings.ApiKey = "SK24c672067c60c99757607f5a14ece7b0"; //Environment.GetEnvironmentVariable("TWILIO_API_KEY");
+                    settings.ChatServiceSid = "ISfe08e187504b453d819fff6d4343bf8a";
                 })
             .AddTransient<IVideoService, VideoService>()
             .AddSpaStaticFiles(config => config.RootPath = "ClientApp");

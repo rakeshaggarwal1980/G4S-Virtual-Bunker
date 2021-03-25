@@ -32,7 +32,7 @@ namespace TeamCollaborationApp.Services
                          _twilioSettings.ApiKey,
                          _twilioSettings.ApiSecret,
                          identity ?? Guid.NewGuid().ToString(),
-                         grants: new HashSet<IGrant> { new VideoGrant() }).ToJwt();
+                         grants: new HashSet<IGrant> { new VideoGrant(), new ChatGrant() { ServiceSid = _twilioSettings.ChatServiceSid } }).ToJwt();
 
         public async Task<IEnumerable<RoomDetails>> GetAllRoomsAsync()
         {
