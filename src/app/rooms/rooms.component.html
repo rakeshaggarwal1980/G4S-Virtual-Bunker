@@ -1,0 +1,70 @@
+﻿<div class="jumbotron">
+    <h5 class="display-4"><i class="fas fa-video"></i> Rooms</h5>
+    <div class="list-group">
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="input-group">
+                <input type="text" class="form-control form-control-lg"
+                       placeholder="Room Name" aria-label="Room Name"
+                       [(ngModel)]="roomName" (keydown.enter)="onTryAddRoom()">
+                <div class="input-group-append">
+                    <button class="btn btn-lg btn-outline-secondary twitter-red"
+                            type="button" [disabled]="!roomName"
+                            (click)="onAddRoom(roomName)">
+                        <i class="far fa-plus-square"></i> Create
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="!rooms || !rooms.length" class="list-group-item d-flex justify-content-between align-items-center">
+            <p class="lead">
+                Add a room to begin. Other online participants can join or create rooms.
+            </p>
+        </div>
+        <a href="#" *ngFor="let room of rooms"
+           (click)="onJoinRoom(room.name)" [ngClass]="{ 'active': activeRoomName === room.name }"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            {{ room.name }}
+            <span class="badge badge-primary badge-pill">
+                {{ room.participantCount }} / {{ room.maxParticipants }}
+            </span>
+        </a>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="device-ctr-size">
+                <button type="button" class="btn btn-lg" (click)="onMiceHanlder()"
+                        title="Click to mute/unmute mice">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            <div class="device-ctr-size">
+                <button type="button" class="btn btn-lg" (click)="onVideoHanlder()"
+                        title="Click to enable/disable video">
+                    <i class="fas fa-video"></i>
+                </button>
+            </div>
+            <div class="device-ctr-size">
+                <button type="button" class="btn btn-lg" (click)="onCaptureScreen()"
+                        title="Click to enable/disable video">
+                    <i class="fas fa-desktop"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div style="width:100%; height:auto; background-color:#ffffff; color:#323030" id="messages"></div>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="input-group">
+                <input id="chat-input" type="text" class="form-control form-control-lg" 
+                       placeholder="Say anything..." 
+                       aria-label="Say anything..." [(ngModel)]="chatText" />
+                <div class="input-group-append">
+                    <button class="btn btn-lg btn-outline-secondary twitter-red"
+                            type="button" [disabled]="!chatText"
+                            (click)="inputChat(chatText)">
+                        <i class="far fa-arrow-circle-right"></i> Send text
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

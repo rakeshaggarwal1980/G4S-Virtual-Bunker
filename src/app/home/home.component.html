@@ -1,0 +1,28 @@
+﻿<div class="grid-container">
+    <div class="grid-bottom-right">
+        <!--<a href="https://twitter.com/davidpine7" target="_blank"><i class="fab fa-twitter"></i> @davidpine7</a>-->
+    </div>
+    <div class="grid-left">
+        <app-rooms #rooms (roomChanged)="onRoomChanged($event)" (miceHandler)="onMiceHanlder($event)" (videoHandler)="onVideoHanlder($event)"
+                   (screenHandler)="captureScreen()"
+                   [activeRoomName]="!!activeRoom ? activeRoom.name : null"></app-rooms>
+    </div>
+    <div class="grid-content">
+        <app-camera #camera [style.display]="!!activeRoom ? 'none' : 'block'"></app-camera>
+        <app-participants #participants
+                          (leaveRoom)="onLeaveRoom($event)"
+                          (participantsChanged)="onParticipantsChanged($event)"
+                          [style.display]="!!activeRoom ? 'block' : 'none'"
+                          [activeRoomName]="!!activeRoom ? activeRoom.name : null"></app-participants>
+    </div>
+    <div class="grid-right">
+        <app-settings #settings (settingsChanged)="onSettingsChanged($event)"></app-settings>
+    </div>
+    <div class="grid-top-left">
+        <a href="#">
+            Team Collaboration App
+        </a>
+    </div>
+
+    <div id="screenp" #screenp></div>
+</div>
