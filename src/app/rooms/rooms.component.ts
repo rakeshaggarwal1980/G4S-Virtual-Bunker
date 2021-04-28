@@ -42,7 +42,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
         this.generalChannel = await this.videoChatService.createOrJoinGeneralChannel();
         // Listen for new messages sent to the channel
         this.generalChannel.on('messageAdded', function (message) {
-
+            
             //this.printMessage(message.author, message.body);
             
             var user = '<span class="username">' + message.author + '</span>';

@@ -82,7 +82,7 @@ export class VideoChatService {
 
         this.chatClient.updateToken(token);
     }
-    
+
     async createOrJoinGeneralChannel() {
         const ADJECTIVES = [
             'Abrasive', 'Brash', 'Callous', 'Daft', 'Eccentric', 'Fiesty', 'Golden',
@@ -93,7 +93,7 @@ export class VideoChatService {
         const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
         let name = rand(ADJECTIVES);
         console.log('Joining channel as ' + name);
-        
+
         try {
             const token = await this.getAuthToken(name);
             console.log('token generated');
@@ -105,7 +105,9 @@ export class VideoChatService {
             console.log('getChannelByUniqueName success!');
 
             this.generalChannel = channel;
-            await this.generalChannel.join();
+            if (this.generalChannel.channelState.status !== "joined") {
+                await this.generalChannel.join();
+            }
             console.log('Joined channel as ' + name);
 
             // when the access token is about to expire, refresh it
@@ -125,7 +127,6 @@ export class VideoChatService {
                 this.roomBroadcast.next(true);
             }
         }
-
         return this.generalChannel;
     }
 

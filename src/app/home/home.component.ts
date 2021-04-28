@@ -38,8 +38,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         const builder =
             new HubConnectionBuilder()
                 .configureLogging(LogLevel.Information)
-                .withUrl(`${location.origin}/notificationHub`);
-
+              //  .withUrl(`${location.origin}/notificationHub`);
+           .withUrl("https://localhost:44314/notificationHub");
         this.notificationHub = builder.build();
         this.notificationHub.on('RoomsUpdated', async updated => {
             if (updated) {
@@ -148,17 +148,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
         //        publication.unpublish();
 
         //        publication.track.disable();
-                
+
         //        publication.track.detach().forEach(el => el.remove());
 
-                
+
         //    }
 
 
-            //publication.track.stop();
-            //const attachedElements = publication.track.detach();
-            //attachedElements.forEach(element => element.remove());
-            //this.activeRoom.localParticipant.unpublishTrack(publication.track);
+        //publication.track.stop();
+        //const attachedElements = publication.track.detach();
+        //attachedElements.forEach(element => element.remove());
+        //this.activeRoom.localParticipant.unpublishTrack(publication.track);
 
         //});
 
@@ -212,7 +212,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
             }
         }).then(function (stream) {
             return new LocalVideoTrack(stream.getVideoTracks()[0]);
-            });
+        });
     }
 
 
@@ -227,14 +227,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     private registerRoomEvents() {
         this.activeRoom
-            .on('disconnected',
-                (room: Room) => room.localParticipant.tracks.forEach(publication => this.detachLocalTrack(publication.track)))
+            .on('disconnected', (room: Room) => {
+                room.localParticipant.tracks.forEach(publication => this.detachLocalTrack(publication.track))
+            })
             .on('participantConnected',
-                (participant: RemoteParticipant) => this.participants.add(participant))
+                (participant: RemoteParticipant) => { this.participants.add(participant) })
             .on('participantDisconnected',
-                (participant: RemoteParticipant) => this.participants.remove(participant))
+                (participant: RemoteParticipant) => { this.participants.remove(participant) })
             .on('dominantSpeakerChanged',
-                (dominantSpeaker: RemoteParticipant) => this.participants.loudest(dominantSpeaker));
+                (dominantSpeaker: RemoteParticipant) => { this.participants.loudest(dominantSpeaker) });
     }
 
     private detachLocalTrack(track: LocalTrack) {
