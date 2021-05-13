@@ -1,4 +1,4 @@
-﻿<div id="participant-list">
+<div id="participant-list">
     <div id="alone" [ngClass]="{ 'table': isAlone, 'd-none': !isAlone }">
         <p class="text-center text-monospace h3" style="display: table-cell">
             You're the only one in this room. <i class="far fa-frown"></i>
@@ -7,6 +7,13 @@
             As others join, they'll start showing up here...
         </p>
     </div>
+    <!--
+        TODO:
+        Add a list of participants, by their identity.
+        Make the list items become a click target.
+        Clicking a participant will make them their video most prominent.
+        Future: Watch for the dominantSpeaker feature to be implemented and do this automatically.
+    -->
     <div [ngClass]="{ 'd-none': isAlone }">
         <nav class="navbar navbar-expand-lg navbar-dark bg-light shadow">
             <ul class="navbar-nav ml-auto">
@@ -19,8 +26,5 @@
             </ul>
         </nav>
         <div #list></div>
-
-
     </div>
-    
 </div>

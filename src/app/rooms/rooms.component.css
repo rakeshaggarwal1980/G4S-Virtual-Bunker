@@ -1,5 +1,15 @@
-﻿body {
+div.jumbotron {
+    background-color: transparent;
 }
-.device-ctr-size button {
-    font-size: 20px;
+
+button > i {
+    padding-right: 6px;
+}
+
+.twitter-red {
+    color: #F22F46;
+}
+
+a {
+    font-size: 1.25rem;
 }

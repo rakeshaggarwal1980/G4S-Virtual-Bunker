@@ -3,9 +3,7 @@ import { ReplaySubject, Observable } from 'rxjs';
 
 export type Devices = MediaDeviceInfo[];
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 export class DeviceService {
     $devicesUpdated: Observable<Promise<Devices>>;
 
@@ -23,6 +21,10 @@ export class DeviceService {
     }
 
     private async isGrantedMediaPermissions() {
+        if (navigator && navigator.userAgent && navigator.userAgent.indexOf('Chrome') < 0) {
+            return true; // Follows standard workflow for non-Chrome browsers.
+        }
+
         if (navigator && navigator['permissions']) {
             try {
                 const result = await navigator['permissions'].query({ name: 'camera' });
@@ -59,7 +61,7 @@ export class DeviceService {
             if (devices.every(d => !d.label)) {
                 devices = await this.tryGetDevices();
             }
-            return devices;
+            return devices.filter(d => !!d.label);
         }
 
         return null;

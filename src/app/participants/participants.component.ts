@@ -22,7 +22,7 @@ import {
     templateUrl: './participants.component.html',
 })
 export class ParticipantsComponent {
-    @ViewChild('list', { static: false }) listRef: ElementRef;
+    @ViewChild('list') listRef: ElementRef;
     @Output('participantsChanged') participantsChanged = new EventEmitter<boolean>();
     @Output('leaveRoom') leaveRoom = new EventEmitter<boolean>();
     @Input('activeRoomName') activeRoomName: string;
@@ -54,6 +54,7 @@ export class ParticipantsComponent {
     }
 
     add(participant: RemoteParticipant) {
+        debugger;
         if (this.participants && participant) {
             this.participants.set(participant.sid, participant);
             this.registerParticipantEvents(participant);
@@ -89,8 +90,8 @@ export class ParticipantsComponent {
 
     private subscribe(publication: RemoteTrackPublication | any) {
         if (publication && publication.on) {
-            publication.on('subscribed', track => this.attachRemoteTrack(track));
-            publication.on('unsubscribed', track => this.detachRemoteTrack(track));
+            publication.on('subscribed', (track: RemoteTrack) => this.attachRemoteTrack(track));
+            publication.on('unsubscribed', (track: RemoteTrack) => this.detachRemoteTrack(track));
         }
     }
 
@@ -115,12 +116,12 @@ export class ParticipantsComponent {
     private isAttachable(track: RemoteTrack): track is RemoteAudioTrack | RemoteVideoTrack {
         return !!track &&
             ((track as RemoteAudioTrack).attach !== undefined ||
-                (track as RemoteVideoTrack).attach !== undefined);
+            (track as RemoteVideoTrack).attach !== undefined);
     }
 
     private isDetachable(track: RemoteTrack): track is RemoteAudioTrack | RemoteVideoTrack {
         return !!track &&
             ((track as RemoteAudioTrack).detach !== undefined ||
-                (track as RemoteVideoTrack).detach !== undefined);
+            (track as RemoteVideoTrack).detach !== undefined);
     }
 }
