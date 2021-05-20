@@ -1,23 +1,50 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { createLocalAudioTrack, Room, LocalTrack, LocalVideoTrack, LocalAudioTrack, RemoteParticipant } from 'twilio-video';
+import { Room, LocalTrack, LocalVideoTrack, LocalAudioTrack, RemoteParticipant } from 'twilio-video';
 import { RoomsComponent } from '../rooms/rooms.component';
 import { CameraComponent } from '../camera/camera.component';
 import { SettingsComponent } from '../settings/settings.component';
 import { ParticipantsComponent } from '../participants/participants.component';
 import { VideoChatService } from '../services/videochat.service';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { debug } from 'console';
 
 @Component({
     selector: 'app-home',
     styleUrls: ['./home.component.css'],
-    templateUrl: './home.component.html',
+  template: `
+    <div class="grid-container">
+        <div class="grid-bottom-right">
+            <a href="https://twitter.com/davidpine7" target="_blank"><i class="fab fa-twitter"></i> @davidpine7</a>
+        </div>
+        <div class="grid-left">
+            <app-rooms #rooms (roomChanged)="onRoomChanged($event)"
+                       [activeRoomName]="!!activeRoom ? activeRoom.name : null"></app-rooms>
+        </div>
+        <div class="grid-content">
+            <app-camera #camera [style.display]="!!activeRoom ? 'none' : 'block'"></app-camera>
+            <app-participants #participants
+                              (leaveRoom)="onLeaveRoom($event)"
+                              (participantsChanged)="onParticipantsChanged($event)"
+                              [style.display]="!!activeRoom ? 'block' : 'none'"
+                              [activeRoomName]="!!activeRoom ? activeRoom.name : null"></app-participants>
+        </div>
+        <div class="grid-right">
+            <app-settings #settings (settingsChanged)="onSettingsChanged($event)"></app-settings>
+        </div>
+        <div class="grid-top-left">
+            <a href="https://www.twilio.com/video" target="_blank">
+                Powered by Twilio
+            </a>
+        </div>
+    </div>
+  `,
+  styles: [
+  ]
 })
 export class HomeComponent implements OnInit {
-    @ViewChild('rooms') rooms: RoomsComponent;
-    @ViewChild('camera') camera: CameraComponent;
-    @ViewChild('settings') settings: SettingsComponent;
-    @ViewChild('participants') participants: ParticipantsComponent;
+    @ViewChild('rooms', { static: false }) rooms: RoomsComponent;
+    @ViewChild('camera', { static: false }) camera: CameraComponent;
+    @ViewChild('settings', { static: false }) settings: SettingsComponent;
+    @ViewChild('participants', { static: false }) participants: ParticipantsComponent;
 
     activeRoom: Room;
 
@@ -30,7 +57,7 @@ export class HomeComponent implements OnInit {
         const builder =
             new HubConnectionBuilder()
                 .configureLogging(LogLevel.Information)
-                .withUrl('https://localhost:44394/notificationHub');
+                .withUrl(`${location.origin}/notificationHub`);
 
         this.notificationHub = builder.build();
         this.notificationHub.on('RoomsUpdated', async updated => {
@@ -41,16 +68,8 @@ export class HomeComponent implements OnInit {
         await this.notificationHub.start();
     }
 
-    async onSettingsChanged(deviceInfo?: MediaDeviceInfo) {
-        await this.camera.initializePreview(deviceInfo.deviceId);
-        if (this.settings.isPreviewing) {
-            const track = await this.settings.showPreviewCamera();
-            if (this.activeRoom) {
-                const localParticipant = this.activeRoom.localParticipant;
-                localParticipant.videoTracks.forEach(publication => publication.unpublish());
-                await localParticipant.publishTrack(track);
-            }
-        }
+    async onSettingsChanged(deviceInfo: MediaDeviceInfo) {
+        await this.camera.initializePreview(deviceInfo);
     }
 
     async onLeaveRoom(_: boolean) {
@@ -59,30 +78,26 @@ export class HomeComponent implements OnInit {
             this.activeRoom = null;
         }
 
+        this.camera.finalizePreview();
         const videoDevice = this.settings.hidePreviewCamera();
-        await this.camera.initializePreview(videoDevice && videoDevice.deviceId);
+        this.camera.initializePreview(videoDevice);
 
         this.participants.clear();
     }
 
     async onRoomChanged(roomName: string) {
-      //  debugger;
         if (roomName) {
             if (this.activeRoom) {
                 this.activeRoom.disconnect();
             }
 
             this.camera.finalizePreview();
+            const tracks = await this.settings.showPreviewCamera();
 
-            const tracks = await Promise.all([
-                createLocalAudioTrack(),
-                this.settings.showPreviewCamera()
-            ]);
-
-          //  debugger;
             this.activeRoom =
                 await this.videoChatService
-                          .joinOrCreateRoom(roomName, tracks);
+                    .joinOrCreateRoom(roomName, tracks);
+
             this.participants.initialize(this.activeRoom.participants);
             this.registerRoomEvents();
 
@@ -91,7 +106,6 @@ export class HomeComponent implements OnInit {
     }
 
     onParticipantsChanged(_: boolean) {
-       // debugger;
         this.videoChatService.nudge();
     }
 
@@ -100,10 +114,7 @@ export class HomeComponent implements OnInit {
             .on('disconnected',
                 (room: Room) => room.localParticipant.tracks.forEach(publication => this.detachLocalTrack(publication.track)))
             .on('participantConnected',
-                (participant: RemoteParticipant) => {
-                    debugger;
-                    this.participants.add(participant);
-                })
+                (participant: RemoteParticipant) => this.participants.add(participant))
             .on('participantDisconnected',
                 (participant: RemoteParticipant) => this.participants.remove(participant))
             .on('dominantSpeakerChanged',

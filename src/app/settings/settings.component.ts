@@ -14,10 +14,36 @@ import { debounceTime } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-settings',
-    styleUrls: ['./settings.component.css'],
-    templateUrl: './settings.component.html'
+  selector: 'app-settings',
+  template: `
+    <div class="jumbotron">
+        <h4 class="display-4"><i class="fas fa-cogs"></i> Settings</h4>
+        <form class="form">
+            <div class="form-group" *ngIf="hasAudioInputOptions">
+                <app-device-select [kind]="'audioinput'"
+                                   [label]="'Audio Input Source'" [devices]="devices"
+                                   (settingsChanged)="onSettingsChanged($event)"></app-device-select>
+            </div>
+            <div class="form-group" *ngIf="hasAudioOutputOptions">
+                <app-device-select [kind]="'audiooutput'"
+                                   [label]="'Audio Output Source'" [devices]="devices"
+                                   (settingsChanged)="onSettingsChanged($event)"></app-device-select>
+            </div>
+            <div class="form-group" *ngIf="hasVideoInputOptions">
+                <app-device-select [kind]="'videoinput'" #videoSelect
+                                   [label]="'Video Input Source'" [devices]="devices"
+                                   (settingsChanged)="onSettingsChanged($event)"></app-device-select>
+            </div>
+        </form>
+        <div [style.display]="isPreviewing ? 'block' : 'none'">
+            <app-camera #camera></app-camera>
+        </div>
+    </div>
+  `,
+  styles: [
+  ]
 })
+
 export class SettingsComponent implements OnInit, OnDestroy {
     private devices: MediaDeviceInfo[] = [];
     private subscription: Subscription;
@@ -33,8 +59,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
         return this.devices && this.devices.filter(d => d.kind === 'videoinput').length > 0;
     }
 
-    @ViewChild('camera') camera: CameraComponent;
-    @ViewChild('videoSelect') video: DeviceSelectComponent;
+    @ViewChild('camera', { static: false }) camera: CameraComponent;
+    @ViewChild('videoSelect', { static: false }) video: DeviceSelectComponent;
 
     @Input('isPreviewing') isPreviewing: boolean;
     @Output() settingsChanged = new EventEmitter<MediaDeviceInfo>();
@@ -60,19 +86,23 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
 
     async onSettingsChanged(deviceInfo: MediaDeviceInfo) {
-        this.settingsChanged.emit(deviceInfo);
+        if (this.isPreviewing) {
+            await this.showPreviewCamera();
+        } else {
+            this.settingsChanged.emit(deviceInfo);
+        }
     }
 
     async showPreviewCamera() {
         this.isPreviewing = true;
 
-        if (!this.camera.videoTrack || this.videoDeviceId !== this.video.selectedId) {
+        if (this.videoDeviceId !== this.video.selectedId) {
             this.videoDeviceId = this.video.selectedId;
             const videoDevice = this.devices.find(d => d.deviceId === this.video.selectedId);
-            await this.camera.initializePreview(videoDevice.deviceId);
+            await this.camera.initializePreview(videoDevice);
         }
 
-        return this.camera.videoTrack;
+        return this.camera.tracks;
     }
 
     hidePreviewCamera() {

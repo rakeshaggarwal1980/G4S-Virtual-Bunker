@@ -1,31 +1,45 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
-import { createLocalVideoTrack, LocalVideoTrack } from 'twilio-video';
-import { StorageService } from '../services/storage.service';
+import { createLocalTracks, LocalTrack, LocalVideoTrack } from 'twilio-video';
 
 @Component({
     selector: 'app-camera',
     styleUrls: ['./camera.component.css'],
-    templateUrl: './camera.component.html',
+  template: `
+    <div id="preview" #preview>
+        <div *ngIf="isInitializing">Loading preview... Please wait.</div>
+    </div>
+  `,
+  styles: [
+  ]
 })
+
 export class CameraComponent implements AfterViewInit {
-    @ViewChild('preview') previewElement: ElementRef;
+    @ViewChild('preview', { static: false }) previewElement: ElementRef;
+
+    get tracks(): LocalTrack[] {
+        return this.localTracks;
+    }
 
     isInitializing: boolean = true;
-    videoTrack: LocalVideoTrack = null;
+
+    private videoTrack: LocalVideoTrack;
+    private localTracks: LocalTrack[] = [];
 
     constructor(
-        private readonly storageService: StorageService,
         private readonly renderer: Renderer2) { }
 
     async ngAfterViewInit() {
         if (this.previewElement && this.previewElement.nativeElement) {
-            const selectedVideoInput = this.storageService.get('videoInputId');
-            await this.initializeDevice(selectedVideoInput);
+            await this.initializeDevice();
         }
     }
 
-    async initializePreview(deviceId: string) {
-        await this.initializeDevice(deviceId);
+    initializePreview(deviceInfo?: MediaDeviceInfo) {
+        if (deviceInfo) {
+            this.initializeDevice(deviceInfo.kind, deviceInfo.deviceId);
+        } else {
+            this.initializeDevice();
+        }
     }
 
     finalizePreview() {
@@ -33,23 +47,22 @@ export class CameraComponent implements AfterViewInit {
             if (this.videoTrack) {
                 this.videoTrack.detach().forEach(element => element.remove());
             }
-            this.videoTrack = null;
         } catch (e) {
             console.error(e);
         }
     }
 
-    private async initializeDevice(deviceId?: string) {
-       // debugger;
+    private async initializeDevice(kind?: MediaDeviceKind, deviceId?: string) {
         try {
             this.isInitializing = true;
 
             this.finalizePreview();
 
-            this.videoTrack = deviceId
-                ? await createLocalVideoTrack({ deviceId })
-                : await createLocalVideoTrack();
+            this.localTracks = kind && deviceId
+                ? await this.initializeTracks(kind, deviceId)
+                : await this.initializeTracks();
 
+            this.videoTrack = this.localTracks.find(t => t.kind === 'video') as LocalVideoTrack;
             const videoElement = this.videoTrack.attach();
             this.renderer.setStyle(videoElement, 'height', '100%');
             this.renderer.setStyle(videoElement, 'width', '100%');
@@ -57,5 +70,18 @@ export class CameraComponent implements AfterViewInit {
         } finally {
             this.isInitializing = false;
         }
+    }
+
+    private initializeTracks(kind?: MediaDeviceKind, deviceId?: string) {
+        if (kind) {
+            switch (kind) {
+                case 'audioinput':
+                    return createLocalTracks({ audio: { deviceId }, video: true });
+                case 'videoinput':
+                    return createLocalTracks({ audio: true, video: { deviceId } });
+            }
+        }
+
+        return createLocalTracks({ audio: true, video: true });
     }
 }

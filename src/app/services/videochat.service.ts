@@ -1,8 +1,7 @@
 import { connect, ConnectOptions, LocalTrack, Room } from 'twilio-video';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ReplaySubject , Observable } from 'rxjs';
-import { debug } from 'console';
+import { ReplaySubject, Observable } from 'rxjs';
 
 interface AuthToken {
     token: string;
@@ -17,7 +16,9 @@ export interface NamedRoom {
 
 export type Rooms = NamedRoom[];
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class VideoChatService {
     $roomsUpdated: Observable<boolean>;
 
@@ -30,25 +31,22 @@ export class VideoChatService {
     private async getAuthToken() {
         const auth =
             await this.http
-                      .get<AuthToken>(`/api/video/token/null`)
-                      .toPromise();
+                .get<AuthToken>(`api/video/token`)
+                .toPromise();
 
         return auth.token;
     }
 
     getAllRooms() {
         return this.http
-                   .get<Rooms>('/api/video/rooms')
-                   .toPromise();
+            .get<Rooms>('api/video/rooms')
+            .toPromise();
     }
 
     async joinOrCreateRoom(name: string, tracks: LocalTrack[]) {
-        debugger;
-        
         let room: Room = null;
         try {
             const token = await this.getAuthToken();
-            console.log(token);
             room =
                 await connect(
                     token, {

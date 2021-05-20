@@ -40,7 +40,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "ClientApp",
+            "outputPath": "dist/ClientApp",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -53,7 +53,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [ ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -88,7 +88,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ClientApp:build"
+            "browserTarget": "ClientApp:build",
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {

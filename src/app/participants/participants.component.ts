@@ -17,12 +17,38 @@ import {
 } from 'twilio-video';
 
 @Component({
-    selector: 'app-participants',
-    styleUrls: ['./participants.component.css'],
-    templateUrl: './participants.component.html',
+  selector: 'app-participants',
+  template: `
+    <div id="participant-list">
+        <div id="alone" [ngClass]="{ 'table': isAlone, 'd-none': !isAlone }">
+            <p class="text-center text-monospace h3" style="display: table-cell">
+                You're the only one in this room. <i class="far fa-frown"></i>
+                <br />
+                <br />
+                As others join, they'll start showing up here...
+            </p>
+        </div>
+        <div [ngClass]="{ 'd-none': isAlone }">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-light shadow">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-lg leave-room"
+                                title="Click to leave this room." (click)="onLeaveRoom()">
+                            Leave "{{ activeRoomName }}" Room?
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+            <div #list></div>
+        </div>
+    </div>
+  `,
+  styles: [
+  ]
 })
+
 export class ParticipantsComponent {
-    @ViewChild('list') listRef: ElementRef;
+    @ViewChild('list', { static: false }) listRef: ElementRef;
     @Output('participantsChanged') participantsChanged = new EventEmitter<boolean>();
     @Output('leaveRoom') leaveRoom = new EventEmitter<boolean>();
     @Input('activeRoomName') activeRoomName: string;
@@ -54,7 +80,6 @@ export class ParticipantsComponent {
     }
 
     add(participant: RemoteParticipant) {
-        debugger;
         if (this.participants && participant) {
             this.participants.set(participant.sid, participant);
             this.registerParticipantEvents(participant);
@@ -90,8 +115,8 @@ export class ParticipantsComponent {
 
     private subscribe(publication: RemoteTrackPublication | any) {
         if (publication && publication.on) {
-            publication.on('subscribed', (track: RemoteTrack) => this.attachRemoteTrack(track));
-            publication.on('unsubscribed', (track: RemoteTrack) => this.detachRemoteTrack(track));
+            publication.on('subscribed', track => this.attachRemoteTrack(track));
+            publication.on('unsubscribed', track => this.detachRemoteTrack(track));
         }
     }
 
@@ -116,12 +141,12 @@ export class ParticipantsComponent {
     private isAttachable(track: RemoteTrack): track is RemoteAudioTrack | RemoteVideoTrack {
         return !!track &&
             ((track as RemoteAudioTrack).attach !== undefined ||
-            (track as RemoteVideoTrack).attach !== undefined);
+                (track as RemoteVideoTrack).attach !== undefined);
     }
 
     private isDetachable(track: RemoteTrack): track is RemoteAudioTrack | RemoteVideoTrack {
         return !!track &&
             ((track as RemoteAudioTrack).detach !== undefined ||
-            (track as RemoteVideoTrack).detach !== undefined);
+                (track as RemoteVideoTrack).detach !== undefined);
     }
 }
